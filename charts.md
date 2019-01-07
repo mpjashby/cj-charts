@@ -18,4 +18,13 @@ order.
   15. Police use of firearms
   16. CSEW drug misuse since ~ 1990
   17. Crimes against businesses
-  18. 
+  18. Homicide by method/weapon
+  19. Prevalence of domestic abuse
+  20. Attrition of sex-offending cases in the CJS
+  21. Theft of vehicles since ~1995
+  22. Re-offending rates over time
+  23. Self-reported offending by age group
+  24. Knife-possession sentencing since 2008
+  25. Deaths in police custody by type since ~2008
+  26. Police complaints by type
+
