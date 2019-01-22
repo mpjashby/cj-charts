@@ -29,4 +29,6 @@ order.
   26. Police complaints by type
   27. Substance misuse in prison
   28. Variations in procurement costs between police forces
-  29. Police force reserves as a proportion of budget
+  29. Police force reserves as a proportion of budget over time
+  30. Stop and search over time
+  31. [Police chief officer pay](https://data.police.uk/data/open-data/) by force size
