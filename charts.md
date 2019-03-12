@@ -34,7 +34,7 @@ order.
   31. [Police chief officer pay](https://data.police.uk/data/open-data/) by force size
   32. Reasons for crime non-reporting, by crime type
   33. Police starting salary over time, compared to average wages
-  34. 
+  34. Police officer causes of on-duty death
   35. 
   36. 
   37. 
