@@ -36,8 +36,8 @@ order.
   33. Police starting salary over time, compared to average wages
   34. Police officer causes of on-duty death
   35. Variation in crime victimisation risk by age, sex etc.
-  36. 
-  37. 
+  36. Importance of crime as an issue of public concern over time
+  37. Places that have lost their local magistrates court, based on Voronoi polygons
   38. 
   39. 
   40. 
