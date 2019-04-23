@@ -54,15 +54,15 @@ workforce %>%
   mutate(
     average = ifelse(senior_ratio > mean(senior_ratio), "above average",
                      "below average"),
-    label = paste0(force, " (", round(senior_ratio), ")"),
-    label = case_when(
-      force %in% head(pluck(arrange(., desc(senior_ratio)), "force"), 10) ~ 
-        label,
-      force %in% head(pluck(arrange(., senior_ratio), "force"), 10) ~ label,
-      force %in% head(pluck(arrange(., desc(total)), "force"), 3) ~ label,
-      total == min(total) ~ label,
-      TRUE ~ ""
-    )
+    label = paste0(force, " (", round(senior_ratio), ")")
+    # label = case_when(
+    #   force %in% head(pluck(arrange(., desc(senior_ratio)), "force"), 10) ~ 
+    #     label,
+    #   force %in% head(pluck(arrange(., senior_ratio), "force"), 10) ~ label,
+    #   force %in% head(pluck(arrange(., desc(total)), "force"), 3) ~ label,
+    #   total == min(total) ~ label,
+    #   TRUE ~ ""
+    # )
   ) %>% 
   ggplot(aes(x = constable, y = senior_ratio, label = label)) +
   geom_hline(
@@ -71,7 +71,7 @@ workforce %>%
     linetype = "44"
   ) +
   geom_smooth(colour = "grey60", fill = "grey80", size = 0.5, se = FALSE) +
-  geom_label_repel(size = 2.5, label.size = 0, min.segment.length = 0, force = 10,
+  geom_label_repel(size = 2.5, label.size = NA, min.segment.length = 0, force = 10,
                    label.padding = unit(0.1, "lines")) +
   geom_point(shape = 21) +
   annotate("label", 
