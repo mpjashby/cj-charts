@@ -28,3 +28,29 @@ order.
   25. Deaths in police custody by type since ~2008
   26. Police complaints by type
   27. Substance misuse in prison
+  28. Variations in procurement costs between police forces
+  29. Police force reserves as a proportion of budget over time
+  30. Stop and search over time
+  31. [Police chief officer pay](https://data.police.uk/data/open-data/) by force size
+  32. Reasons for crime non-reporting, by crime type
+  33. Police starting salary over time, compared to average wages
+  34. Police officer causes of on-duty death
+  35. Variation in crime victimisation risk by age, sex etc.
+  36. Importance of crime as an issue of public concern over time
+  37. Places that have lost their local magistrates court, based on Voronoi polygons
+  38. Trust in CJ professions (police, judges etc.) over time in comparison to other professions
+  39. 
+  40. 
+  41. 
+  42. 
+  43. 
+  44. 
+  45. 
+  46. 
+  47. 
+  48. 
+  49. 
+  50. 
+  51. 
+  52. 
+  
