@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>crime on Crime and Justice Chart of the Week</title>
+    <link>/categories/crime/</link>
+    <description>Recent content in crime on Crime and Justice Chart of the Week</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 30 Apr 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/crime/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>For women, attackers are more likely to have a familiar face</title>
+      <link>/post/violence-risk/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/violence-risk/</guid>
+      <description>Men of all ages are more likely to be attacked by strangers than by people they know. Women have a lower risk of being victims of violence than men do, but (except before age 25) are as likely to be attacked by an acquaintance as by a stranger.
+Data source: Crime Survey for England and Wales, 2018</description>
+    </item>
+    
+  </channel>
+</rss>

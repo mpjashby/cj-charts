@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Crime and Justice Chart of the Week</title>
+    <link>/tags/</link>
+    <description>Recent content in Tags on Crime and Justice Chart of the Week</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 01 May 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>criminal justice</title>
+      <link>/tags/criminal-justice/</link>
+      <pubDate>Wed, 01 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/criminal-justice/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>police</title>
+      <link>/tags/police/</link>
+      <pubDate>Wed, 01 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/police/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>CSEW</title>
+      <link>/tags/csew/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/csew/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>crime</title>
+      <link>/tags/crime/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/crime/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>drugs</title>
+      <link>/tags/drugs/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/drugs/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>prison</title>
+      <link>/tags/prison/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/prison/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>sex</title>
+      <link>/tags/sex/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/sex/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>trends</title>
+      <link>/tags/trends/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/trends/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>violence</title>
+      <link>/tags/violence/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/violence/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
