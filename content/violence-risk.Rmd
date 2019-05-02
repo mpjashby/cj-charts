@@ -1,0 +1,138 @@
+---
+title: For women, attackers are more likely to have a familiar face
+author: Matt Ashby
+date: '2019-04-30'
+draft: true
+slug: violence-risk
+tags:
+  - CSEW
+  - crime
+  - violence
+  - sex
+---
+
+```{r set knitr options, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE, include=FALSE)
+```
+
+```{r set chart parameters}
+chart_details <- list(
+	id = "violence-risk",
+	title = "For women, attackers are more likely to have a familiar face",
+	subtitle = "Men of all ages are more likely to be attacked by strangers than by people they know. Women have a lower risk of being victims of violence than men do, but (except before age 25) are as likely to be attacked by an acquaintance as by a stranger.",
+	source_url = "https://www.ons.gov.uk/peoplepopulationandcommunity/crimeandjustice/datasets/personalcrimeprevalencecsewopendatatable",
+	source_title = "Crime Survey for England and Wales, 2018"
+)
+```
+
+```{r load packages and helper}
+# custom packages not loaded by helpers.R
+
+# load this after loading custom packages
+source(here::here("helpers.R"))
+```
+
+```{r get and tidy data}
+if (!file.exists(paste0(chart_details$id, "-data.csv.gz"))) {
+	
+	# download data	
+data_file <- tempfile()
+GET("https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/crimeandjustice/datasets/personalcrimeprevalencecsewopendatatable/current/personalprevalence2018q4.zip", write_disk(data_file))
+unzip(data_file, files = "Personal crime_Prevalence_England and Wales_2018Q4.csv",
+      exdir = tempdir())
+
+# read data file
+file_data <- read_csv(
+	paste0(tempdir(), "/Personal crime_Prevalence_England and Wales_2018Q4.csv")
+)
+
+	# tidy data
+	tidy_data <- file_data %>% 
+  # clean variable names
+  clean_names() %>% 
+  # convert estimates to numeric
+  mutate_at(vars(one_of("estimate", "standard_error", "unweighted_count")),
+            as.numeric) %>% 
+  # convert percentages to proportions
+  mutate_at(vars(one_of("estimate", "standard_error")), ~ . / 100)
+
+	# save tidy data
+	write_csv(tidy_data, paste0(chart_details$id, "-data.csv.gz"))	
+
+} else {
+	
+	# load tidy data
+	tidy_data <- read_csv(paste0(chart_details$id, "-data.csv.gz"))
+	
+}
+```
+
+```{r prepare plot data}
+chart_data <- tidy_data %>% 
+  # filter out characteristics that aren't needed
+  filter(
+    sex != "All adults",
+    !age %in% c("16+", "75+"),
+    measurement_var %in% c("acquai_p", "strang_p"), # prevalence of violence
+    characteristic_var == "Total"
+  ) %>% 
+  mutate(
+    measurement_var = fct_recode(measurement_var,
+                                 "someone the victim knows" = "acquai_p",
+                                 "someone the victim does not know" = "strang_p"),
+    sex = fct_recode(sex, "men" = "Male", "women" = "Female")
+  )
+```
+
+```{r build plot}
+chart <- chart_data %>% 
+  ggplot(aes(x = fct_rev(age), y = estimate, group = measurement_var, 
+             fill = measurement_var)) +
+  geom_col(position = position_dodge(), width = 0.8) + 
+  scale_y_continuous(expand = c(0, 0), 
+                     labels = scales::percent_format(accuracy = 1)) +
+  scale_fill_manual(
+    values = unname(ucl_colours_list[c("Bright Green", "Bright Blue")])
+  ) +
+  facet_grid(rows = vars(sex)) +
+  coord_flip() +
+  labs(
+    title = chart_details$title,
+    subtitle = format_subtitle(chart_details$subtitle),
+    caption = format_caption(chart_details$source_title, chart_details$id),
+    tag = "@lesscrime",
+    x = NULL,
+    y = "proportion of people who were victims of violent crime at least once in the past 12 months",
+    fill = "violence committed by …"
+  ) +
+  theme_cjcharts() +
+  theme(
+    panel.grid.major.x = element_line(),
+    panel.grid.minor.x = element_line(),
+    panel.grid.major.y = element_blank()
+  )
+```
+
+`r chart_details$subtitle`
+
+```{r display plot, echo=FALSE, include=TRUE}
+chart + labs(
+	title = NULL,
+	subtitle = NULL
+)
+```
+
+[larger image](../`r chart_details$id`.png) | [PDF](../`r chart_details$id`.pdf)
+| [annotated R code to produce this chart](https://github.com/mpjashby/cj-charts/blob/master/content/`r chart_details$id`.Rmd)
+
+Data source: [`r chart_details$source_title`](`r chart_details$source_url`)
+
+```{r export chart}
+# save PNG for social media
+ggsave(filename = paste0(chart_details$id, ".png"), plot = chart, 
+			 device = "png", width = 600 / 72, height = 400 / 72, units = "in")
+
+# save PDF for website
+ggsave(filename = paste0(chart_details$id, ".pdf"), plot = chart, 
+			 device = cairo_pdf, width = 600 / 72, height = 400 / 72, units = "in")
+```
