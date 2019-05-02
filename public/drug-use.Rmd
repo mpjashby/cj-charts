@@ -1,0 +1,202 @@
+---
+title: Drug use was falling, but that seems to be changing
+author: Matt Ashby
+date: '2019-04-30'
+slug: drug-use
+draft: true
+categories: []
+tags:
+  - crime
+  - CSEW
+  - drugs
+---
+
+```{r set knitr options, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE, include=FALSE)
+```
+
+```{r load packages and helper}
+# custom packages not loaded by helpers.R
+library("lubridate")
+library("readxl")
+
+# load this after loading custom packages
+source(here::here("helpers.R"))
+```
+
+```{r set chart parameters}
+chart_details <- list(
+	id = "drug-use",
+	title = "Drug use was falling, but that seems to be changing",
+	subtitle = "Self-reported drug use has fallen for most of the past 20 years, but in the past six years the use of cannabis, cocaine and ecstasy has increased, particularly among people aged 16–24. However, drug use is still lower now than it was at the turn of the millenium.",
+	source_url = "https://www.gov.uk/government/statistics/drug-misuse-findings-from-the-2017-to-2018-csew",
+	source_title = "Crime Survey for England and Wales, 2018"
+)
+```
+
+```{r get and tidy data}
+if (!file.exists(paste0(chart_details$id, "-data.csv.gz"))) {
+	
+	# download data
+	data_file <- tempfile(fileext = ".xlsx")
+	GET("https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/728748/drug-misuse-1718-tables.xlsx", write_disk(data_file))
+	
+	# read data
+	# data for young people is in a separate sheet to data for all adults, so the
+	# two sheets are read separately and then merged
+	file_data <- list(
+		"16–59 years" = read_excel(data_file, sheet = "1.02", skip = 3),
+		"16–24 years" = read_excel(data_file, sheet = "1.06", skip = 3)
+	)
+	
+	# tidy data
+	tidy_data <- file_data %>% map(function (x) {
+		x %>% 
+			# unusually, we will not clean_names() at this point because we are going
+			# to gather the columns later, although we can still rename the first 
+			# column
+			rename(drug_type = `...1`) %>%
+			# remove blank rows below header and footnotes below data
+			slice(3:33) %>% 
+			# remove trailing columns showing significance, etc.
+			select(1:21) %>% 
+			# remove blank columns
+			filter_all(all_vars(!is.na(.))) %>% 
+			# strip footnote markers from drug_type
+			mutate(drug_type = str_remove(drug_type, "\\d+$")) %>% 
+			# gather the years of data into long format
+			gather(key = "period", value = "estimate", -drug_type) %>% 
+			# replace 'n/a' strings with NA, which allows us convert estimate to 
+			# numeric, converting percentages to proportions at the same time
+			mutate(estimate = ifelse(estimate == "n/a", NA, 
+															 as.numeric(estimate) / 100)) %>% 
+			# extract year from period description
+			mutate(
+				year = ymd(paste0(str_sub(period, 0, 4), "-01-01"))
+			)
+	}) %>% 
+		bind_rows(.id = "age_group")
+	
+	# save tidy data
+	write_csv(tidy_data, paste0(chart_details$id, "-data.csv.gz"))	
+	
+} else {
+	
+	# load tidy data
+	tidy_data <- read_csv(paste0(chart_details$id, "-data.csv.gz"))
+	
+}
+```
+
+```{r prepare data for chart}
+chart_data <- tidy_data %>% 
+	# select data wanted for chart
+	filter(
+		drug_type %in% c("Any cocaine", "Ecstasy", "Hallucinogens", "Amphetamines", 
+										 "Cannabis", "Amyl nitrite"),
+		year >= max(year) - years(20)
+	) %>% 
+	# change category names for display
+	mutate(
+		drug_type = recode(drug_type,
+											 "Any cocaine" = "Cocaine",
+											 "Hallucinogens" = "LSD/magic mushrooms",
+											 "Amyl nitrite" = "Amyl nitrite*"
+		)
+	)
+
+mean_data <- chart_data %>% 
+	filter(age_group == "16–59 years") %>% 
+	group_by(drug_type) %>% 
+	summarise(mean_estimate = mean(estimate, na.rm = TRUE)) %>% 
+	arrange(desc(mean_estimate))
+
+chart_data <- chart_data %>% 
+	left_join(mean_data, by = "drug_type") %>% 
+	mutate(drug_type = fct_reorder(drug_type, mean_estimate, .desc = TRUE)) %>% 
+	remove_missing(na.rm = TRUE)
+
+perc_change <- chart_data %>% 
+	filter(
+		drug_type %in% c("Cocaine", "Ecstasy", "Cannabis"),
+		age_group == "16–24 years"
+	) %>% 
+	group_by(drug_type, age_group) %>% 
+	summarise(
+		some_estimate_ago = nth(estimate, -6),
+		last_estimate = last(estimate),
+		some_years_ago = nth(year, -6),
+		last_year = last(year),
+		# mid_point = nth(year, -6) + (last(year) - nth(year, -6)) / 2,
+		change = (last(estimate) - nth(estimate, -6)) / nth(estimate, -6),
+		label = sprintf("%+.0f%%", change * 100)
+	)
+```
+
+```{r build plot}
+chart <- chart_data %>% 
+  ggplot(aes(x = year, y = estimate, linetype = age_group, shape = age_group,
+  					 colour = drug_type)) + 
+	geom_line() +
+	geom_segment(aes(x = some_years_ago, xend = last_year, y = some_estimate_ago, 
+									 yend = last_estimate, colour = drug_type), 
+							 data = perc_change, linetype = "solid", 
+							 arrow = arrow(length = unit(6, "pt")), 
+							 position = position_nudge(y = 0.02), show.legend = FALSE) + 
+  geom_text(aes(x = last_year, y = last_estimate, colour = drug_type, 
+  							label = label), 
+  					data = perc_change, size = 9 / (14 / 5),
+            hjust = "right", vjust = "bottom", nudge_y = 0.03) +
+	scale_x_date(date_breaks = "6 years", date_labels = "%Y") +
+  scale_y_continuous(limits = c(0, NA), expand = c(0, 0),
+  									 labels = scales::percent_format(accuracy = 1)) +
+  scale_colour_manual(
+    values = unname(ucl_colours_list[c("Orange", "Bright Blue", "Bright Pink",
+                                       "Bright Green", "Bright Red", 
+                                       "Light Blue", "Yellow", "Mid Green")]),
+    guide = "none"
+  ) +
+	scale_linetype_manual(
+		values = c("11", "52"), 
+		guide = guide_legend(override.aes = list(colour = "black"))
+	) + 
+	scale_shape_manual(values = c(16, 1), guide = "none") + 
+  facet_grid(cols = vars(drug_type), labeller = label_wrap_gen(width = 15)) +
+  labs(
+    title = chart_details$title,
+    subtitle = format_subtitle(chart_details$subtitle),
+    caption = format_caption(chart_details$source_title, chart_details$id,
+    												 "* data only collected until 2016"),
+    tag = "@lesscrime",
+    x = NULL,
+    y = "people who have used drugs in the past year",
+    linetype = "people aged …"
+  ) +
+	theme_cjcharts() +
+	theme(
+	)
+```
+
+`r chart_details$subtitle`
+
+```{r display plot, echo=FALSE, include=TRUE}
+chart + labs(
+	title = NULL,
+	subtitle = NULL
+)
+```
+
+[larger image](../`r chart_details$id`.png) | [PDF](../`r chart_details$id`.pdf)
+| [annotated R code to produce this chart](https://github.com/mpjashby/cj-charts/blob/master/content/`r chart_details$id`.Rmd)
+
+Data source: [`r chart_details$source_title`](`r chart_details$source_url`)
+
+```{r export chart}
+# save PNG for social media
+ggsave(filename = paste0(chart_details$id, ".png"), plot = chart, 
+			 device = "png", width = 600 / 72, height = 400 / 72, units = "in")
+
+# save PDF for website
+ggsave(filename = paste0(chart_details$id, ".pdf"), plot = chart, 
+			 device = cairo_pdf, width = 600 / 72, height = 400 / 72, units = "in")
+```

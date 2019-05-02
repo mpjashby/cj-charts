@@ -1,0 +1,17 @@
+theme = "hugo-paper"
+baseURL = "http://mpjashby.github.io/"
+relativeurls = true
+languageCode = "en-us"
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+title = "Crime and Justice Chart of the Week"
+
+[[menu.main]]
+  name = "About"
+  url = "/about/"
+
+[social]
+  github = "https://github.com/mpjashby/cj-charts"
+  twitter = "https://twitter.com/lesscrime"
+
+[params]
+  dateFormat = "02 January 2006"

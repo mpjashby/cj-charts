@@ -1,0 +1,45 @@
+---
+title: Prison likelihood
+author: Matt Ashby
+date: '2019-04-30'
+slug: prison-likelihood
+categories: []
+tags:
+  - prison
+  - sex
+  - criminal justice
+---
+
+```{r set knitr options, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE, include=FALSE)
+```
+
+```{r set chart parameters}
+chart_details <- list(
+	id = "prison-likelihood",
+	title = "Prison likelihood",
+	subtitle = "",
+	source_url = "",
+	source_title = ""
+)
+```
+
+```{r load packages and helper}
+# custom packages not loaded by helpers.R
+
+
+# load this after loading custom packages
+source(here::here("helpers.R"))
+```
+
+```{r get data}
+# data_file <- tempfile()
+# GET("", write_disk(data_file))
+# unzip(data_file, files = "Personal crime_Prevalence_England and Wales_2018Q4.csv",
+#       exdir = tempdir())
+# 
+# file_data <- read_csv(
+# 	paste0(tempdir(), "/Personal crime_Prevalence_England and Wales_2018Q4.csv")
+# )
+```
+

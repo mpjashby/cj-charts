@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Crime and Justice Chart of the Week</title>
+    <link>/post/</link>
+    <description>Recent content in Posts on Crime and Justice Chart of the Week</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 30 Apr 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Drug use was falling, but that seems to be changing</title>
+      <link>/post/drug-use/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/drug-use/</guid>
+      <description>Self-reported drug use has fallen for most of the past 20 years, but in the past six years the use of cannabis, cocaine and ecstasy has increased, particularly among people aged 16–24. However, drug use is still lower now than it was at the turn of the millenium.
+larger image
+Data source: Crime Survey for England and Wales, 2018</description>
+    </item>
+    
+    <item>
+      <title>Drug use was falling, but that seems to be changing</title>
+      <link>/post/drug-use/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/drug-use/</guid>
+      <description>Self-reported drug use has fallen for most of the past 20 years, but in the past six years the use of cannabis, cocaine and ecstasy has increased, particularly among people aged 16–24. However, drug use is still lower now than it was at the turn of the millenium.
+larger image
+Data source: Crime Survey for England and Wales, 2018</description>
+    </item>
+    
+    <item>
+      <title>Fewer people are victims of common crimes than 30 years&#39; ago</title>
+      <link>/post/crime-trends/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/crime-trends/</guid>
+      <description>Data source: Crime Survey for England and Wales, 2018</description>
+    </item>
+    
+    <item>
+      <title>For women, attackers are more likely to have a familiar face</title>
+      <link>/post/violence-risk/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/violence-risk/</guid>
+      <description>Men of all ages are more likely to be attacked by strangers than by people they know. Women have a lower risk of being victims of violence than men do, but (except before age 25) are as likely to be attacked by an acquaintance as by a stranger.
+Data source: Crime Survey for England and Wales, 2018</description>
+    </item>
+    
+    <item>
+      <title>Prison likelihood</title>
+      <link>/post/prison-likelihood/</link>
+      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/prison-likelihood/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
