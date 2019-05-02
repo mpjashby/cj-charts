@@ -1,0 +1,182 @@
+---
+title: Most crimes don't get solved, but for different reasons
+author: 'Matt Ashby'
+date: '2019-05-01'
+draft: true
+slug: detection-rates
+categories: []
+tags:
+  - police
+  - criminal justice
+---
+
+```{r set knitr options, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE, include=FALSE)
+```
+
+```{r load packages and helper}
+# custom packages not loaded by helpers.R
+library("reticulate")
+
+# load this after loading custom packages
+source(here::here("helpers.R"))
+```
+
+```{r initialise custom functions}
+fct_case_when <- function(...) {
+  args <- as.list(match.call())
+  levels <- sapply(args[-1], function(f) f[[3]])  # extract RHS of formula
+  levels <- levels[!is.na(levels)]
+  factor(dplyr::case_when(...), levels=levels)
+}
+```
+
+```{r set chart parameters}
+chart_details <- list(
+	id = "detection-rates",
+	title = "Most crimes don't get solved, but for different reasons",
+	subtitle = "Most property crimes aren't solved because no suspect is ever identified, while for violent crimes (except murder) a suspect is usually identified but there is not enough evidence to prosecute.",
+	source_url = "https://www.gov.uk/government/statistics/police-recorded-crime-open-data-tables",
+	source_title = "Home Office, 2018"
+)
+```
+
+```{r get and tidy data}
+if (!file.exists(paste0(chart_details$id, "-data.csv.gz"))) {
+	
+	# download data	
+	data_file <- paste0(tempfile(), ".ods")
+	csv_file <- paste0(data_file, ".csv")
+	GET("https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/796973/prc-outcomes-open-data-mar2018-tables.ods", write_disk(data_file))
+	
+	# convert ODS to CSV
+	source_python(here::here("ods_to_csv.py"))
+	ods_to_csv(data_file, "Outcomes_open_data__2017-18", csv_file)
+	
+	# read CSV file
+	file_data <- read_csv(csv_file)
+	
+	# tidy data
+	tidy_data <- file_data %>% 
+		# clean variable names
+		clean_names() %>% 
+		rename(offences = force_outcomes_for_offences_recorded_in_quarter) %>% 
+		# filter out expired offence codes
+		filter(is.na(offence_code_expired)) %>% 
+		# warning notes related to obsolete offence codes mean the offences column 
+		# has the type character, which we can now correct
+		mutate(offences = as.integer(offences))
+	
+	# save tidy data
+	write_csv(tidy_data, paste0(chart_details$id, "-data.csv.gz"))	
+
+} else {
+	
+	# load tidy data
+	tidy_data <- read_csv(paste0(chart_details$id, "-data.csv.gz"))
+	
+}
+```
+
+```{r prepare data for chart}
+chart_data <- tidy_data %>% 
+  # merge some offence descriptions
+  mutate(offence_label = fct_case_when(
+    offence_subgroup == "Homicide" ~ "murder and\nmanslaughter",
+    offence_subgroup %in% c("Violence with injury", "Violence without injury") & 
+      !offence_description %in% c("Child abduction", "Conspiracy to murder", 
+        "Cruelty to children/young persons", "Harassment", "Kidnapping", 
+        "Modern slavery", "Procuring illegal abortion", 
+        "Racially or religiously aggravated harassment", "Stalking", 
+        "Threats to kill") ~ "non-sexual\nassault",
+    offence_subgroup == "Rape" ~ "rape",
+    offence_subgroup == "Robbery" ~ "robbery",
+    offence_group == "Criminal damage and arson" ~ "damage to\nproperty",
+    offence_subgroup %in% c("Domestic burglary", "Non-domestic burglary") ~ 
+      "burglary",
+    offence_subgroup %in% c("Theft of a motor vehicle", "Theft from a vehicle") 
+    ~ "theft of or\nfrom a vehicle",
+    TRUE ~ "other"
+  )) %>% 
+  # remove unwanted offence descriptions
+  filter(offence_label != "other") %>% 
+  # filter out disposal types that are not of interest
+  filter(!outcome_type %in% c(0, 4, 20)) %>% 
+  # merge some disposal options
+  mutate(disposal = fct_case_when(
+    outcome_type %in% c(1) ~ "solved: suspect sent to court",
+    # outcome_type %in% c(2, 3, 5, 6, 7, 8, 11, 12, 13, 17) ~ "case solved but not sent to court",
+    outcome_type %in% c(5, 11, 12, 13, 17) ~ "solved: prosecution not possible (e.g. suspect died)",
+    outcome_type %in% c(2, 3, 6, 7, 8) ~ "solved: resolved out of court (e.g. with a formal warning)",
+    # outcome_type %in% c(9, 10, 15, 16, 21) ~ "suspect identified but case not solved",
+    outcome_type %in% c(9, 10, 21) ~ "solved: sufficient evidence but prosecution not in the public interest",
+    outcome_type %in% c(15, 16) ~ "not solved: potential suspect identified but evidence insufficient",
+    outcome_type %in% c(14, 18) ~ "not solved: investigation did not identify a suspect",
+    TRUE ~ "other"
+  )) %>% 
+  # flag for whether the case was solved or not
+  mutate(solved = ifelse(str_detect(disposal, "^solved"), "solved", 
+                         "not solved")) %>% 
+  # count disposal types by crime type
+  count(offence_label, solved, disposal, wt = offences) %>% 
+  group_by(offence_label) %>% 
+  mutate(percentage = n / sum(n)) %>% 
+  ungroup()
+```
+
+```{r build plot}
+chart <- chart_data %>% 
+  ggplot(aes(x = solved, y = percentage, fill = disposal,
+             label = scales::percent(percentage, accuracy = 1))) +
+  geom_col() +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.2), 
+                     expand = c(0, 0),
+                     labels = scales::percent_format(), limits = c(0, 1)) +
+  scale_fill_manual(
+    values = unname(ucl_colours_list[c("Blue Celeste", "Light Blue", 
+                                       "Bright Blue", "Dark Blue", "Orange", 
+                                       "Bright Red")]),
+    guide = guide_legend(ncol = 1)
+  ) +
+  facet_grid(rows = vars(offence_label)) +
+  coord_flip() +
+  labs(
+    title = chart_details$title,
+    subtitle = format_subtitle(chart_details$subtitle),
+    caption = format_caption(chart_details$source_title, chart_details$id),
+    legend = NULL,
+    x = NULL,
+    y = NULL
+  ) +
+  theme_cjcharts() +
+	theme(
+		panel.grid.major.x = element_line(),
+		panel.grid.minor.x = element_line(),
+		panel.grid.major.y = element_blank(),
+		panel.grid.minor.y = element_blank(),
+	)
+```
+
+`r chart_details$subtitle`
+
+```{r display plot, echo=FALSE, include=TRUE}
+chart + labs(
+	title = NULL,
+	subtitle = NULL
+)
+```
+
+[larger image](../`r chart_details$id`.png) | [PDF](../`r chart_details$id`.pdf)
+| [annotated R code to produce this chart](https://github.com/mpjashby/cj-charts/blob/master/content/`r chart_details$id`.Rmd)
+
+Data source: [`r chart_details$source_title`](`r chart_details$source_url`)
+
+```{r export chart}
+# save PNG for social media
+ggsave(filename = paste0(chart_details$id, ".png"), plot = chart, device = "png", 
+       width = 600 / 72, height = 400 / 72, units = "in")
+
+# save PDF for website
+ggsave(filename = paste0(chart_details$id, ".pdf"), plot = chart, device = cairo_pdf, 
+       width = 600 / 72, height = 400 / 72, units = "in")
+```
