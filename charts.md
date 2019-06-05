@@ -49,7 +49,7 @@ These are ideas for charts relating to crime and justice, in approximate order.
   47. 
   48. Variations disposals for cannabis possession by police force
   49. 
-  50. 
+  50. Taser use by type
   51. 
   52. 
   
